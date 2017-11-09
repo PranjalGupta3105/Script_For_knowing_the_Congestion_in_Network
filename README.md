@@ -1,6 +1,8 @@
 # Script_For_knowing_the_Congestion_in_Network
 
 // Author - Pranjal Gupta
+
+
 $$
 The file ' newnetscript ' is a linux shell script that is used to measure the network congestion. The Script is Open Source to use and build the further applicability of the commands in linux.
 It first creates a set of IP address from the initial value of IP address like 192.168.16.1 and on execution of the command saves the record of the set of IP addresses upto 255 in the Postgres Table.
