@@ -1,0 +1,144 @@
+#!/bin/bash
+
+i=0
+
+psql -c "insert into data(ip_addresses) select * from list_ip;" firstdb postgres
+
+while [ $i -le 11 ]
+do
+
+fping -a -g 192.168.16.1/24 |grep -Eo "([0-9]+\.?){4}">abcd.txt
+#      Initial test for finding the Alive IP's in my network using fping command with -a for all alive ones and -g for all in       series
+#      grabing up the alive IP's addresses "IP ADDRESS" and storing it into the text file to create a log list of the Ip Add.       in my network domain
+					# lab ip=172.16.2.1/24 
+					# my_net=172.16.2.1/24
+outfile="/root/Desktop/yeah"
+# Declaring an Emptied Output file for the Incoming ping requests over the Desktop 
+
+raw=""
+# Declaring an Empty Variable 
+
+echo -n > "${outfile}"
+
+
+hr=$(date +"%I")
+min=$(date +"%M")
+sec=$(date +"%S")
+
+#Creating the Column for the table to feed the Enteries into
+
+psql -c "alter table data add column TTL_val"${i}" int;" firstdb postgres
+
+for ip in $(cut -c1- abcd.txt);  #Chopping off the first column and first row from the list of alive IP's in text file
+do
+	raw=`ping -c 1 $ip | grep ttl |awk '{print $6}'|cut -d '=' -f 2` 
+	#Pinging and grabbing the ttl value only from the Ping command Output 
+
+	if [ "$raw" != "" ]
+	then
+                echo "${ip}                ${raw}" >> $outfile #Saving Ip Address and corresponding ttl value in the Output 
+                                                       #file Declared before
+	
+		sudo -u postgres -H -- psql -d firstdb -c "update data set TTL_val"${i}"=${raw} where ip_addresses='${ip}';"
+
+		sudo -u postgres -H -- psql -d firstdb -c "select * from data;">basic${i}.txt>>basic${i}2.txt
+
+	else
+		      		
+		sudo -u postgres -H -- psql -d firstdb -c "update data set TTL_val"${i}"=0 where ip_addresses='${ip}';"
+		
+		sudo -u postgres -H -- psql -d firstdb -c "select * from data;">basic${i}.txt>>basic${i}2.txt
+		
+                
+		echo "${ip}                 ${raw}" >> $outfile #If Ping at the IP address fails once I Try to ping the                                                                     corresponding alive IP
+	fi
+
+	get_ip=$(sudo -u postgres -H -- psql firstdb -c "select ip_addresses from list_ip where ip_addresses='${ip}'; "|grep -Eo "([0-9]+\.?){4}")
+	if_ttl=$(psql -c "select TTL_val"${i}" from data where ip_addresses='${ip}';" firstdb postgres)
+
+        if [ ${ip} != $get_ip ]
+        then
+	#hye the ip doesn't belong to the set of IP addresses defined in the list  of Ip Addresses or isn't valid.
+        echo "Not a valid IP belonging to our set of IP's"
+        else
+	#Me checking for whether the ttl_vale wasn't inserted before 
+	#if [ ${if_ttl} -eq 0 ]
+	#then
+        echo "Valid values of TTL Inserted for the IP"
+	fi
+
+
+done
+	#inner for loop ends here.....................................
+
+((i++)) 
+	# Change my counter value to get to new run
+
+echo -e "\e[1;46m This is to sleep for 5 seconds  \e[0m"
+
+sleep 5
+
+echo -e "\e[1;47m Hye Man!!  Just Woke Up after My sleep Let's Run Again \e[0m"
+
+echo -e "\e[1;45m This is ${i} script run \e[0m"
+
+done
+
+# This is to fill Up the Empty spots of columns whose IP Pings didn't get TTL Values
+
+i=0
+
+while [ $i -le 11 ]
+do
+
+sudo -u postgres -H -- psql -d firstdb -c "update data set TTL_val"${i}"= 0 where TTL_val"${i}" IS NULL;"
+# Where ever the TTl value will not be found for a given IP Address this will set its value=0 for each column
+
+((i++))
+#counter incremented for each column
+
+done
+
+cat $outfile 
+# Finally print the attribute values of the output file
+
+echo -e "\e[1;37m This is Final Output Kept as log in text File  \e[0m"
+
+echo $(sudo -u postgres -H -- psql -d firstdb -c "select * from data;")
+
+./dbconnector.py
+
+
+
+#################################                   Dumped Logics Here                   ####################################
+
+ 		#get_ip=$(sudo -u postgres -H -- psql firstdb -c "select ip_addresses from data where ip_addresses='${ip}' ORDER BY ip_addresses")
+
+                #if [ $i -eq 0 ]
+                #then
+
+                #sudo -u postgres -H -- psql -d firstdb -c "insert into data(IP_Addresses,TTL_val"${i}") values('${ip}',0);"
+
+                #sudo -u postgres -H -- psql -d firstdb -c "insert into data(TTL_val"${i}") values(0);"
+
+                #else
+
+		#sudo -u postgres -H -- psql -d firstdb -c "insert into data(IP_Addresses,TTL_val"${i}") values('${ip}',0);"
+
+                #fi
+                
+                # If the IP comes alive in between then these set of Queries will check that whether they are authenticated or not and then just insert the IP addresses values and not the ttl value ttl will be insert at the last in second while loop              
+                #get_ip=$(sudo -u postgres -H -- psql firstdb -c "select ip_addresses from list_ip where ip_addresses='${ip}'; "|grep -Eo "([0-9]+\.?){4}")
+                
+                #if [ $get_ip != ${ip} ]
+                #then
+                #echo "Not a valid IP belonging to our set of IP's"
+                #else
+                #psql -c "insert into data(IP_Addresses) values ('${ip}');" firstdb postgres
+                #fi
+
+
+
+
+
+

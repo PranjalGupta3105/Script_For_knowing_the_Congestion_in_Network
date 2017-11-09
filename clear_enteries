@@ -1,0 +1,13 @@
+#!/bin/bash
+
+sudo -u postgres -H -- psql -d firstdb -c "delete from data;"
+
+i=0
+
+for i in {0..11}
+do
+sudo -u postgres -H -- psql -d firstdb -c "alter table data drop column ttl_val"${i}";"
+done
+
+
+

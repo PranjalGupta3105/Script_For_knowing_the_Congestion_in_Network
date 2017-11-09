@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# sudo -u postgres -H -- psql -d firstdb -c "select * from data;"
+
+sudo -u postgres -H -- psql -d firstdb -c "select * from data ORDER BY ip_addresses;"
+

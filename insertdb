@@ -1,0 +1,11 @@
+#!/bin/bash
+
+i=1
+
+while [ $i -le 255 ]
+do
+psql -c "insert into list_ip values('192.168.16.${i}');" firstdb postgres
+((i++))
+done 
+
+sudo -u postgres -H -- psql -d firstdb -c "select * from list_ip;"

@@ -1,0 +1,31 @@
+<html><head><title>My Summary Report</title>
+</head>
+<body>
+<div id='content'>
+<p id="give_break"></p>
+<br>
+</div>
+<script>
+var counter;
+var main_div=document.getElementById('content')
+var para=document.getElementById('give_break') 
+for(counter=1;counter<=255;counter++)
+{
+var x=document.createElement("img");
+x.src="/root/Desktop/pielogs/192.168.16."+counter+".png";
+x.id="pingresultfor"+counter;
+main_div.appendChild(x);
+para.innerHTML="<hr>"
+/*var check=document.getElementById('x.id');
+check.onerror=function(){
+check.alt="Image Not available for";
+};*/
+//var y=document.createElement("hr");
+//para.appendChild(y);
+/* document.getElementById('container').innerHTML="abcd" -->
+ appendChild(document.createElement("img src='/root/Desktop/pielogs/192.168.16.1.jpeg'")) */
+//document.getElementById('pingresultfor'+counter).document.createElement("hr")
+}
+</script>
+</body>
+</html>
